@@ -48,8 +48,59 @@ router.post("/clientes/cadastrar", (req,res) =>{
 
      }).catch(error =>{
         console.log("Ocorreu um erro ao cadastrar o cliente." + error)
-     });
+     }); 
 });
 
+//rota de  exclusao de cliente
+router.get("/clientes/excluir/:id", (req,res) => {
+    //CAPTURANDO O PARAMETRO DA ROTA
+    const id = req.params.id
+    //enviando o id do cliente para apagar do banco de dados
+    Cliente.destroy({
+        where:{
+            //banco //parametro recebido
+            id: id
+        }
+    }).then(() => {
+        res.redirect("/clientes")
+        //falha
+    }).catch(error => {
+        console.log("Ocorreu um erro ao excluir o cliente" + error);
+    });
+});
+
+//rota de edicao do cliente
+router.get("/clientes/editar/:id", ( req,res) => {
+    const id = req.params.id
+    //buscando o cliente no banco
+    Cliente.findByPk (id).then(cliente => {
+        res.render("clienteEditar", {
+            //passando os dados do cliente para a pagina
+            cliente : cliente
+        });
+    });
+});
+
+//rota de alteraçao de cliente
+router.post("/clientes/alterar", (req,res) => {
+    //coletando  os dados do formulario
+
+    const nome = req.body.nome
+    const cpf = req.body.cpf
+    const endereco = req.body.endereco
+    const id = req.body.id//alterando o cliente no banco
+    Cliente.update(
+        {
+            nome : nome,
+            cpf : cpf,
+            endereco : endereco,
+
+        },
+        {where: {id : id}}
+    ).then(() =>{
+        res.redirect("/clientes")
+    });
+
+});
 //exportando o modulo para usa-lo em outro arquivo
 export default router;

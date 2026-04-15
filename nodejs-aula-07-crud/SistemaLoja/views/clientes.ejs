@@ -39,6 +39,7 @@
                                 <th>Nome:</th>
                                 <th>CPF:</th>
                                 <th>Endereço:</th>
+                                <th colspan="2" style="text-align: center;">Ações:</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -53,6 +54,21 @@
                                     </td>
                                     <td>
                                         <%= cliente.endereco %>
+                                    </td>
+                                    <td>
+                                        <!--editar-->
+                                        <a href="/clientes/editar/<%= cliente.id %>">
+                                            <button class="btn btn-warning">
+                                                Editar
+                                            </button>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="/clientes/excluir/<%= cliente.id %>">
+                                            <button onclick="return confirm('Deseja mesmo excluir o cliente?')" class="btn btn-danger">
+                                                Excluir
+                                            </button>
+                                        </a>
                                     </td>
                                 </tr>
                                 <% }) %>
