@@ -15,4 +15,6 @@ const Pedido = connection.define("pedido", {
         allowNull: false,
     },
 });
+//Pedido.sync({force:false});
+
 export default Pedido;
