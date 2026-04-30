@@ -1,0 +1,79 @@
+// Importando o Express
+//const express = require("express")
+import express from "express";
+//importando o controller de cliente (onde estao as rotas)
+import ClienteController from "./controllers/ClienteController.js"
+import ProdutoController from "./controllers/ProdutoController.js"
+import PedidoController from "./controllers/PedidoController.js"
+import connection from "./config/sequelize-config.js";
+
+//importando os models
+import Cliente from "./models/Cliente.js";
+import Pedido from "./models/Pedido.js";
+//importando o model de usuario
+import Usuario from "./models/Usuario.js";
+
+import associations  from "./config/associations.js";
+
+//realizando a conexao com o banco de dados
+connection.authenticate().then(() => {
+    console.log("Conexao com o banco de dados realizada com sucesso!")
+}).catch((error) => {
+    console.log(`/ocorreu um erro ao se conectar ao banco`)
+});
+
+//criando o banco de dados (somente se ainda nao existir)
+connection.query("CREATE DATABASE IF NOT EXISTS loja_relacional;").then(() =>{
+}).catch((error) =>{
+    console.log(`Ocorreu um erro ao criar o banco de dados. Erro ${error}`);
+});
+
+associations();
+
+//sincronizando os Models de Cliente e Pedido
+Promise.all(
+[
+Cliente.sync({force:false}),
+Pedido.sync({force:false})
+]
+).then(() => {
+    console.log("Entidades criadas e relacionadas com sucesso!")
+}).catch(error => {
+    console.log("Ocorreu um erro ao sincronizar os Models." + error);
+});
+
+// Iniciando o Express 
+const app = express() 
+// Define o EJS como Renderizador de páginas
+app.set('view engine', 'ejs')
+// Define o uso da pasta "public" para uso de arquivos estáticos
+app.use(express.static('public'))
+//configurando o express para aceitar dados vindo de formulario
+app.use(express.urlencoded({extended: false}))
+
+//ativando o uso das rotas
+app.use("/",ClienteController)
+app.use("/",PedidoController)
+app.use("/",ProdutoController)
+
+
+// ROTA PRINCIPAL
+app.get("/",function(req,res){
+    res.render("index")
+});
+
+//ROTA DE LOGIN
+app.get("/login", (req,res) => {
+    res.render("login");
+});
+
+// INICIA O SERVIDOR NA PORTA 8080
+const port = 8080
+app.listen(port, function(erro){
+    if(erro) {
+        console.log("Ocorreu um erro!")
+
+    }else{
+        console.log(`Servidor iniciado com sucesso em http://localhost:${port}`)
+    }
+})
