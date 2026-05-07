@@ -2,9 +2,13 @@
 //const express = require("express")
 import express from "express";
 //importando o controller de cliente (onde estao as rotas)
-import ClienteController from "./controllers/ClienteController.js"
-import ProdutoController from "./controllers/ProdutoController.js"
-import PedidoController from "./controllers/PedidoController.js"
+import ClienteController from "./controllers/ClienteController.js";
+import ProdutoController from "./controllers/ProdutoController.js";
+import PedidoController from "./controllers/PedidoController.js";
+import UsuarioController from "./controllers/UsuarioController.js";
+//importando o express-session (gerador de sessoes do express)
+import session from "express-session";
+
 import connection from "./config/sequelize-config.js";
 
 //importando os models
@@ -12,6 +16,9 @@ import Cliente from "./models/Cliente.js";
 import Pedido from "./models/Pedido.js";
 //importando o model de usuario
 import Usuario from "./models/Usuario.js";
+
+//importando o MIDDLEWARE DE AUTENTICAÇAO
+import Auth from "./middlewares/Auth.js";
 
 import associations  from "./config/associations.js";
 
@@ -51,14 +58,24 @@ app.use(express.static('public'))
 //configurando o express para aceitar dados vindo de formulario
 app.use(express.urlencoded({extended: false}))
 
+//configurando a sessao do usuario
+app.use(session({
+    secret: "minhalojasecrect",
+    cookie: {maxAge: 3600000},//sessao expira em 30 segundos (mudar depois)
+    saveUninitialized: false, //nao salva sessoes vazias (sem informaçoes)
+    resave: false, //evita que re-salve sessoes
+}));
+
 //ativando o uso das rotas
-app.use("/",ClienteController)
-app.use("/",PedidoController)
-app.use("/",ProdutoController)
+app.use("/",ClienteController);
+app.use("/",PedidoController);
+app.use("/",ProdutoController);
+app.use("/",UsuarioController);
+
 
 
 // ROTA PRINCIPAL
-app.get("/",function(req,res){
+app.get("/",Auth, function(req,res){
     res.render("index")
 });
 
@@ -74,6 +91,6 @@ app.listen(port, function(erro){
         console.log("Ocorreu um erro!")
 
     }else{
-        console.log(`Servidor iniciado com sucesso em http://localhost:${port}`)
+        console.log(`Servidor iniciado com sucesso em http://localhost:${port}`);
     }
-})
+});

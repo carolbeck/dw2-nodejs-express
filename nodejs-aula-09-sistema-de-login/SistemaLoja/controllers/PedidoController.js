@@ -6,8 +6,11 @@ const router = express.Router()
 import Pedido from "../models/Pedido.js";
 import Cliente from "../models/Cliente.js";
 
+//importando o MIDDLEWARE DE AUTENTICAÇAO
+import Auth from "../middlewares/Auth.js";
+
 // ROTA PEDIDOS
-router.get("/pedidos",function(req,res){
+router.get("/pedidos", Auth, function(req,res){
    //fazendo inner join para trazer as informaçoes do cliente junto com as inofrmaçoes do pedido
 
    //realizando ambas as consultas em paralelo
@@ -34,7 +37,7 @@ Cliente.findAll(),
 });
 });
 //ROTA DE CADASTRO DE PEDIDOS
-router.post("/pedidos/cadastrar", (req,res) => {
+router.post("/pedidos/cadastrar", Auth,(req,res) => {
     //CAPTURAR OS DADOS DO FORMULARIO
     const numero = req.body.numero
     const valor = req.body.valor
@@ -52,7 +55,7 @@ router.post("/pedidos/cadastrar", (req,res) => {
 });
 
 //rota de exclusao de pedidos
-router.get("/pedidos/excluir/:id", (req,res) => {
+router.get("/pedidos/excluir/:id",Auth, (req,res) => {
     Pedido.destroy({
         where : {
             id : id,
